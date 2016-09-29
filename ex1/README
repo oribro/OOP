@@ -3,26 +3,38 @@ orib
 =============================
 =      File description     =
 =============================
-ProductType.java - Contains details regarding a product, implements the class of ProductType.
-Customer.java - Implements the Customer class. Contains details about a customer in the store.
-Store.java - Implements the Store class. Contains details about the store.
+Competition.java - Contains the competition class implementation and the main method of the program.
+Board.java - Implements the Board class which represents the board of the nim game and details about it.
+Move.java - Implements the Move class which represents a move made buy a player on the board.
+Player.java - Implements the Player class which represents types of players that can play the game.
 
 
 
 =============================
 =          Design           =
 =============================
-This excerscise is about managing a store with products and customers, as we practice the usage of classes.
-In this excercise we were required to implement 3 classes, each one I implemented according to the given API's.
-I used different types of variables: int, string, and array of objects. I also implemented different methods
-among the classes, all together contribute to the integrity of the "store system": the products in the store,
-the customers, and the financial aspects that are being involved in the commerce.
-
+We were asked to implement the classes so that the output will be exactly the same as the school solution,
+so thats what i did. In the Player class I used a private method "rowIsMarked" that checks if a given row is
+marked in order to make the implementation of the smart and random players simpler. For Smart player see below.
 
 
 =============================
 =  Implementation details   =
 =============================
-In the Store class, I used an array of objects of ProductType as we were instructed in the API.
-This allowed me to obtain easy access to the properties of each of the store's products.
+
+I implemented the Smart player in the Player class in the following manner:
+The key principle of this strategy is that after the game was played for some turns, only the last
+row that was left with unmarked sticks matters. To secure the victory, we need to make sure that 
+our opponent will make the last turn, and he will have only one stick left available to mark,
+meaning that after his turn we will win because all the sticks on the board will be marked.
+Then, it suffices in each turn to count the number of marked (unmarked) rows on the board, and as long as there
+is more than 1 unmarked row, we produce a random move since only the case of 1 unmarked row matters.
+When in some turn there is only 1 unmarked row left, we would like to mark the longest legal sequence we can mark
+on this last unmarked row. If we succeed in producing a sequence longer than 1 stick, then we leave one stick 
+unmarked so we improve our chances of winning. If 1 stick to mark is the only legal option, we will mark it and
+try again in our next turn. 
+This strategy performs better than the random because it focuses on the last moments of the game where the moves 
+are crucial, where the random will keep randomly marking sticks.
+
+
 
