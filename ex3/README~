@@ -1,0 +1,114 @@
+orib
+
+=============================
+=      File description     =
+=============================
+This jar file contains:
+
+Rehashable.java - This interface will be implemented by hash sets that support rehashing.
+It's method: public void rehash(SimpleHashSet newTable), will insert all the elements from the current table
+to a new one with different capacity. That will complete the rehashing process.
+
+LinkedCell.java - This class represents a cell in the hash table using linked list. 
+It has a constructor which creates a new linked list in the current cell in 
+order to support chaining. We use delegation from chainedHashSet class
+in order to create the hash table.
+
+SimpleHashSet.java - An abstract class of a hash set, implementing 
+SimpleSet interface.
+
+ChainedHashSet.java - This class represents a hash table with chaining
+to solve collisions issues.
+
+OpenHashSet.java - This class represents a hash table with quadratic
+hash function in open addressing to solve collisions issues.
+
+CollectionFacadeSet.java - wraps objects that implement java
+ collection<String> interface.
+
+SimpleSetPerformanceAnalyzer.java - The main class to run tests with
+the different data structures.
+
+QUESTIONS.txt  - Answers some questions asked about class material.
+
+RESULTS.txt - Performance analysis of some different data structures
+
+
+
+
+=============================
+=          Design           =
+=============================
+
+I used the Rehashable interface In order to let different types of hash
+tables that use rehashing the ability to implement this interface and
+be able to rehash. The common property of rehashing is more of a specific
+ behavior defined by one class and used by another. This is why i chose
+to use interface. As a result I had to use up and down casting in order
+to provide the rehash method with an abstract type of hash table, which
+then can be interperted to a specific type of hash table in it's own class.
+
+The usage of LinkedCell array provided delegation so I could control the 
+capacity of the hash table in a better way.
+
+I used private methods and fields for the inherited hash classes In order
+to match the minimal API principle as much as I could.
+
+I prefered to use more methods with more parameters that they receive in 
+order to prevent code repetition and make the code more organized.
+It can be seen for example in the SimpleSetPerformanceAnalyzer where
+there is a single method that performs all the tests by getting the 
+needed parameters.
+
+
+=============================
+=  Implementation details   =
+=============================
+
+I've Implemented the ChainedHashSet table using delegation to LinkedCell[],
+means that the ChainedHashSet class contains a data member of LinkedCell[] 
+object type. That object is an array of cells, and in each cell there 
+can be a linked list if a value is mapped to that cell.
+So in overall we have a hash set object that uses an array of cells as
+it's table, and the values in the table are stored in linked lists
+constructed by the LinkedCell class.
+
+I've implemented the deletion mechanism in OpenHashSet by creating a new
+String object labeled "DELETED" which has it's own space in memory.
+When we delete a string from the table, "DELETE" will take it's place.
+Since "DELETE" is a new object,and since when we compare strings by "==" we
+ will compare their referances and not their objects, we make sure that
+"DELETED" cannot be confused with one of the inserted keys and when we
+will probe the table and reach "DELETED", we will know it's there by it's
+referance and then continue searching for an element that was probed
+deeper into the table or insert there a new element.
+
+=============================
+=  Results for tests   =
+=============================
+
+1. Adding with data1: The hash set of java is the fastest with 47ms. 
+for the other results see RESULTS file.
+
+2. Adding with data2: The hash set of java is also the fastest here
+with 7ms. For the other results see RESULTS file.
+
+3. Comparison for add between the 2 files: 
+Chain : Data2 was faster.
+Open : Data2 was faster.
+Tree : Data2 was faster.
+LinkedList : Data2 was faster.
+HashSet : Data2 was faster.
+
+4. Contain hi : Hash set was fastest with 1381ns. See RESULTS file.
+
+5. Contain negative: HashSet was fastest with 1178ns. See RESULTS file.
+
+6. I had no time to complete the comparison, but the results are in
+the RESULTS file and can be compared there..
+
+
+
+
+
+

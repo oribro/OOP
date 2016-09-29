@@ -1,0 +1,128 @@
+
+orib
+
+
+=============================
+=      File description     =
+=============================
+AvlTree.java - This class represents the AVL tree data structure from DAST.
+This class inherits from BST since Avl tree is a BST by definition, that
+preserves the height difference property:
+the height difference between each left sub-tree and right sub-tree of a node
+is at most 1.
+
+BinarySearchTree.java - This class represents a BST from DAST with algorithms
+to perform on it. BST is a binary tree such that for every sub-tree's root,
+the left sub-tree contains the values that are smaller than it's value,
+while the right sub-tree contains the values that are bigger.
+For elaborate description see Implementation details section.
+
+QUESTIONS.txt - contains answers to the asked questions.
+
+
+=============================
+=          Design           =
+=============================
+
+Firstly I decided to implement the BST class because every public method
+of the AvlTree in the given API can be used on a general BST and not 
+specificly AvlTree. Then, my AvlTree inherits the general methods such
+as add and delete from the BST and just adds it's own methods to take
+care of the height property. Since the AvlTree uses some of BST's methods
+such as treeSearch, I could not declare most BST's methods as private,
+so instead i declared them as package-private, that way only the classes
+of the data_structures package of ex4 can have access to the BST, while
+external classes would not see it. That way I could maintain a fair
+degree of encapsulation and still construct a reasonable tree heirarchy.
+It was important that I declared the AVL methods that I added as private
+such as treeBalance since only the AvlTree uses them.
+Also for every tree action I made, I tried to put it in a designated method
+in order to reduce code repetition.
+
+Lastly, I've created a static nested class named TreeNode inside the BST
+class that keeps all the information of a node in the tree. I couldn't
+set it as private because the AvlTree uses it to perform it's actions,
+so i made it package-private. It gives increased encapsulation since 
+it's a part of the BST class and it's implementation, and should not be
+bothering external classes.
+
+
+
+=============================
+=  Implementation details   =
+=============================
+BinarySearchTree class: add - inserts a value to the BST in the same way
+we saw in DAST, delete - deletes a value from the BST and contains - 
+checks if a value is in the BST, all of them are based on the algorithms
+for BST from DAST. treeSearch - searches the BST for a value and 
+findSuccessor - finds the successor of a value in the tree. The rest 
+of the methods are helper methods for the above methods.
+The AvlTree uses this class to perform the corresponding actions 
+on itself before taking into consideration the heights of the nodes.
+
+TreeNode class: this is a nested class in the BST that holds nodes'
+information. updateHeight method - updates the height of a specific node
+according to the heights of it's sons (if exist) and recursively updates
+ it's parents' heights. The AvlTree uses this class
+to update the heights of nodes after an add or delete operation and also
+to gain access to node properties.
+
+AvlTreeIterator class: this inner class inside the AvlTree was made to 
+hold information about an iterator of on the AvlTree. The iterator is
+initialized on the minimal element in the tree and on each iteration it
+proceeds to the successor of the current element, resulting in an ascending
+order of traversal. The AvlTree uses this class to create an iterator 
+to go over the tree values which I used to implement the deepcopy constructor.
+
+More adjustments that can be made to improve this code:
+I've implemented the iterator only for the AVL tree and not for the BST,
+even though it should be implemented for the BST with the AVL to inherit it,
+since the AVL property has no meaning when it comes to iterate over the nodes.
+Also, the updateHeight method in the TreeNode class should be in the main 
+section of the BST class since it iterates over sections of the tree
+and not just on specific node.
+
+The add method in the AvlTree: the AvlTree calls for the add method in
+the BST to add the node in the general BST. If the node has been 
+successfuly added, the program will find the added node using treeSearch
+from BST (Now that i think of it, treeSearch takes O(logn) and it might be
+expensive to search the node again after it was added), update the heights of
+the node and it's ancestors using updateHeight from TreeNode since each
+ancestor's height has been increased by 1, and lastly call the private 
+AvlTree method treeBalance to check the balance factor of the node and
+it's ancestors to see if the tree needs a balancing after the insertion.
+To get the balance factor I used the private method getBalanceFactor which
+calculates the balance factor of a node based on its subtrees' heights.
+If it is to balance, the treeBalance method will call the rotationRight,
+,rotationLeft or both methods in order to perform rotations on the node
+that creates a violation according to the type of the violation: 
+RR, RL, LR, LL as we have seen in DAST. The rotations are performed
+based on the algorithms suggested in DAST (each rotation requires
+updating the data memebers of the rotated nodes in the TreeNode class).
+
+The delete method in the AvlTree: the AvlTree calls for the delete method in
+the BST to delete the node in the general BST. We use treeSearch from BST
+ to find the node. If it was deleted we keep it's
+father and call the treeBalance method on the father (if it exists) to check
+ if the tree needs a balancing as a result of the deletion. 
+Since deleting a node in the tree doesn't affect the height of the ancesotrs,
+we only need to check for the balance. It will be done as mentioned in the 
+add method description.
+The shared methods between the 2 methods are treeBalance and treeSearch.
+
+=============================
+=    Answers to questions   =
+=============================
+
+
+
+
+
+
+
+
+
+
+
+
+

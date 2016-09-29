@@ -1,0 +1,127 @@
+orib
+
+=============================
+=      File description     =
+=============================
+SpaceShip.java - This class is an abstract class of spaceships. It defines a
+ general spaceship with general properties. each of the 6 different types
+of spaceships will inherit from this class.
+SpaceShipFactory.java - This class is used by the supplied driver to create
+all the spaceship objects according to the command line arguments.
+HumanSpaceShip.java - This spaceship is controlled by the user. It will perform
+actions according to the user input.
+RunnerSpaceShip.java - This spaceship attempts to run away from the fight.
+It will try to dodge nearby spaceships.
+BasherSpaceShip.java - This ship attempts to collide with other ships.
+It will chase other spaceships with its shield on when close enough.
+AggressiveSpaceShip.java - This ship pursues other ships and tries
+to fire at them. 
+DrunkardSpaceShip.java - This ship wanders aimlessly around the space since
+ the driver is drunk. This ship performs random actions. More details
+in the implementation details section below.
+SpecialSpaceShip.java - This ship has unique behaviour and is stronger
+than the previous types of spaceships. See below for more details.
+
+
+
+
+=============================
+=          Design           =
+=============================
+
+I've implemented the SpaceShip class as an abstract class
+with 3 abstract methods. The SpaceShip class has all of the attributes 
+(has a -relation) and methods that a general spaceship should have. 
+Therfore, its constants, variables and methods are common to all
+spaceships. The exceptions are the abstract methods which every
+different type of spaceship should inherit and implement according to
+its behaviour:
+getImage() - Each spaceship has its own image, whether it turns on
+the shield or not, and whether it's human or computer
+doAction(SpaceWars game) - Each spaceship behaves differently and performs
+different actions, depending on its type.
+shouldTurn(SpaceWars game) - Each spaceship turns according to different
+patterns.
+
+- Extensibility: My program is easy to extend by adding more classes of
+spaceships, because each class can inherit from SpaceShip the majority
+of the properties. The disadvantages is that each class that will be added
+must implement all of the 3 methods, even if some of them are trivial or
+common to other types of spaceships. This may result in code repetition:
+for example, the shouldTurn method of the basher and the aggressive types
+are the same, and I had to repeat the same implementation for both of them.
+
+- Modularity: My program is easy to use since it is managed by the SpaceWars
+class that calls to the other different classes, that is, I managed to
+implement a quite complex game with lots of functions using not-so-many
+classes, this is pretty amazing and convinient.
+The disatvantages are that by using more classes, there are more details
+we must share the public with, and the code becomes denser and harder to
+modify because every field is supported by more classes.
+
+- Intuitiveness and understandability: I tried to prevent long lines of code
+by using more methods and more spaces when needed. Also I tried to
+document every non-intuitive implementation I made, and give intuitive
+names to data members and other fields. I also tried to make the code
+as short as I could. The disadvantages are that more methods are used,
+and it may make confusion when some user tries to follow up on the code.
+
+- Sensible representation of the classes and their relationships: 
+The SpaceWars class we were given has to have access to the methods 
+we were given in the class SpaceShip because it calls them upon managing
+a game. Therfore these methods remain public, otherwise they won't be 
+visible to the SpaceWars and an error will occur.
+The other methods that I created were made protected since only the 
+different types of spaceships that inherit from SpaceShip are interested
+in these methods. Same goes for data members which these classes use.
+Those data members who are unique for SpaceShip remained private.
+This way we can acheive better information sharing and less code to be 
+revealed = less problems.
+The disadvantages are that even though we prefer that everything will
+be private, we still have to share details with the inherited classes
+and it may conflict with the extensibility becuase if we want to add
+new classes of spaceships, they will have to be aware of these protected
+fields also, and so we share more information.
+
+
+
+=============================
+=  Implementation details   =
+=============================
+In my implementation I prefered to use extra methods in order to make the
+code more readable and easier to use (e.g the angle/distanceToClosestShip
+methods in the SpaceShip class), and prevent code repetition.
+Also, as always, I tried to use as many constants as I can (magic numbers),
+most of them are found in the SpaceShip class (see design section).
+
+Drunkard ship - I tried to use as many random actions as I could think of,
+and I came up with random actions for: turning and acceleration,
+firing and turning the shield on and off.
+Since the nextInt() method of the random object returns a number in a uniform
+distribution, I figured out the following calculations:
+The ship will have  33% chance to turn left or right.
+ 50% chance to accelerate.
+ 20% chance for the shield to be turned on for j number of rounds, 0<=j<=4
+ 5% chance to fire a shot.
+As a result, the ship will hardly move in circles, nor constantly straight
+forward, more like a drunk person would move. It will hardly fire,
+and when it does it will fire without any logic, mostly just wasting
+its energy. It will also turn it's shield on for a changing duration 
+and depending on that duration, it will turn it off for a changing
+duration, making it look like it's sparkling.
+
+Special ship - This ship is a demigod: it will chase and fire at you,
+ and if close enough it will try to bash you with its shields.
+But the most interesting part: If you face it directly and look it in
+the eye, it will empower, meaning it will teleport away and will regenerate
+all of its attributes. So, in order to beat this ship you will have to
+find a way to confront it without looking at it, not to mention firing at it
+because the shots will probably miss and it is more likely that you will
+make it respawn with full health. Can you beat this ship?
+I know I couldn't..
+
+
+
+
+
+
