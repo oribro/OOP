@@ -4,132 +4,306 @@ orib
 =============================
 =      File description     =
 =============================
-AvlTree.java - This class represents the AVL tree data structure from DAST.
-This class inherits from BST since Avl tree is a BST by definition, that
-preserves the height difference property:
-the height difference between each left sub-tree and right sub-tree of a node
-is at most 1.
 
-BinarySearchTree.java - This class represents a BST from DAST with algorithms
-to perform on it. BST is a binary tree such that for every sub-tree's root,
-the left sub-tree contains the values that are smaller than it's value,
-while the right sub-tree contains the values that are bigger.
-For elaborate description see Implementation details section.
+QUESTIONS.txt - answers to the questions.
 
-QUESTIONS.txt - contains answers to the asked questions.
+##### filescript package #####
+
+BadArgumentsError.java -  This error will be thrown when the program's
+ arguments are not in the right format (anything other than 2 given args).
+
+BadCommandFileError.java - This error will be thrown when there is an
+ invalid sub section of the command file - no FILTER/ORDER or no filter type.
+
+BadSubSectionWarning.java - This warning will be thrown when there is an
+ invalid type or parameters of filter/order in a line of the command file.
+
+FilePrinter.java - This class is responsible for the output of this program.
+ It prints files according to a given section of the command file,
+ and warnings  if the files could not be printed as requested.
+
+MyError.java - This class is for type 2 errors of the program. 
+ These errors will result in printing "ERROR" to STDERR and exiting
+ the program.
+
+ MyException.java - This class is for concentrating the warnings
+ - type 1 errors - of  the program. These exceptions will result
+ in printing a warning to the output and continuing the flow of the
+ program in some manner.
+
+MyFileScript.java -  The manager for the program: it will call the parser
+ to parse the command file, and will call the printer to iterate over the
+ different sections, printing warnings and filtered ordered files.
+It is also the main method of the program.
+
+MyUtilities.java - Utility class to work with files.
+
+Parser.java - This class represents a parser for the command file.
+ The parser scans the command file and creates sections of it.
+ Each section holds instructions for how to handle the files of the dir.
+
+Section.java -  This class represents a section in the command file,
+ composed of order and filter objects.
+
+##### filterpackage #####
+
+AllFilter.java - Filters all the files in the dir.
+
+BadFilterNameWarning.java - This warning will be thrown if the input name of
+ filter was misspelled.
+
+BadFilterPropertyWarning.java - This warning will be thrown if the parameters
+ of one of the hidden/executable/writable filters were invalid.
+
+BadFilterSizeWarning.java - This warning will be thrown if the parameters
+ of one of the GreaterThan/SmallerThan/Between filters were invalid.
+
+BadFilterWarning.java - This warning will be thrown if the name or parameters
+ for a filter were invalid.
+
+BetweenFilter.java - Filters files with size between (inclusive) the given
+ numbers (in k-bytes).
+
+ContainsFilter.java - Filters according to the string contained in the file
+ name (excluding path).
+
+ExecutableFilter.java - Filters files by their presence of execute permission.
+
+FileFilter.java - Filters the file if it equals the given file name
+ (excluding path).
+
+Filter.java - This interface represents a general filter for files.
+
+FileFactory.java - This class creates filter objects according to the
+ factory design pattern.
+
+GreaterThanFilter.java - Filters files with file size strictly greater
+ than the given number of k-bytes.
+
+HiddenFilter.java - Filters files by their property of being hidden.
+
+InvalidFilterError.java - This error will be thrown if 'FILTER' was misspelled
+
+NegFilter.java - Filters a file by the negation of a given filter using
+ decorator design pattern.
+
+PrefixFilter.java - Filters files by the prefix of the file name
+ (excluding path).
+
+SmallerThanFilter.java - Filters files with size strictly less than the given
+ number of k-bytes.
+
+SuffixFilter.java - Filters files by the suffix of the file name
+ (excluding path).
+
+WritableFilter.java - Filters files by their presence of writing permission.
+
+##### orderpackage #####
+
+AbsOrder.java - Order files by their absolute path.
+
+BadOrderNameWarning.java - This warning will be thrown if the name of
+ the order type is invalid.
+
+InvalidOrderError.java - This error will be thrown if 'ORDER' was misspelled.
+
+Order.java - This interface represents a general ordering of files.
+
+OrderFactory.java - This class creates order objects according to
+ the factory design pattern.
+
+ReverseOrder.java - Orders files in a reverse order of a given
+ order using decorator design pattern.
+
+SizeOrder.java -  Order files by their size.
+
+TypeOrder.java - Order files by their type.
+
+
+
 
 
 =============================
 =          Design           =
 =============================
 
-Firstly I decided to implement the BST class because every public method
-of the AvlTree in the given API can be used on a general BST and not 
-specificly AvlTree. Then, my AvlTree inherits the general methods such
-as add and delete from the BST and just adds it's own methods to take
-care of the height property. Since the AvlTree uses some of BST's methods
-such as treeSearch, I could not declare most BST's methods as private,
-so instead i declared them as package-private, that way only the classes
-of the data_structures package of ex4 can have access to the BST, while
-external classes would not see it. That way I could maintain a fair
-degree of encapsulation and still construct a reasonable tree heirarchy.
-It was important that I declared the AVL methods that I added as private
-such as treeBalance since only the AvlTree uses them.
-Also for every tree action I made, I tried to put it in a designated method
-in order to reduce code repetition.
+My program includes 5 independet modules as we saw in the Tirgul:
+Filters, orders, sections, parser and manager. When combined together
+they bring this program to life, with each module takes it's own 
+responsibility in the program. For detailed program flow see
+implementaton details below.
 
-Lastly, I've created a static nested class named TreeNode inside the BST
-class that keeps all the information of a node in the tree. I couldn't
-set it as private because the AvlTree uses it to perform it's actions,
-so i made it package-private. It gives increased encapsulation since 
-it's a part of the BST class and it's implementation, and should not be
-bothering external classes.
+I chose to follow the design shown in Tirgul 9 because it seems plausible
+and supports the open-close and single choice principles, and also supports
+modular continuity. To elaborate, I created general filter and order
+ interfaces, and each specific order/filter added to  this program must
+implement the appropriate interface.
+ I used the decorator design pattern for the negation filter and the
+ reverse order, and also for the buffered reader of the parser which as
+ explained in class, allows us to enhance the
+reader with additional ability of reading files in an efficient way.
+
+I also used the factory design pattern for filters and orders, each module
+has its own factory. This allows us to concentrate the creation of many
+different objects of the same module in one place and "relieve pressure" 
+from the parser - it doesn't have to deal with this exhausting 
+task, it gets the prepared objects and uses them. 
+
+I used a class with static methods called 'MyUtilities' to work with files 
+and get information regarding them.
+
 
 
 
 =============================
 =  Implementation details   =
 =============================
-BinarySearchTree class: add - inserts a value to the BST in the same way
-we saw in DAST, delete - deletes a value from the BST and contains - 
-checks if a value is in the BST, all of them are based on the algorithms
-for BST from DAST. treeSearch - searches the BST for a value and 
-findSuccessor - finds the successor of a value in the tree. The rest 
-of the methods are helper methods for the above methods.
-The AvlTree uses this class to perform the corresponding actions 
-on itself before taking into consideration the heights of the nodes.
 
-TreeNode class: this is a nested class in the BST that holds nodes'
-information. updateHeight method - updates the height of a specific node
-according to the heights of it's sons (if exist) and recursively updates
- it's parents' heights. The AvlTree uses this class
-to update the heights of nodes after an add or delete operation and also
-to gain access to node properties.
+I used java's ArrayList to divide the command file into sections using
+the parser and store them, also used it to store the files of the sourcedir
+and store the warnings of each section. I used ArrayList because it supports
+a dynamic insertion of objects which is useful in case of storing the above
+objects since we are given directory and command file without knowing
+the amount of files in the directory nor the amount of sections in the
+command file. Therfore each time we find a wanted object we insert it
+to the ArrayList and it's pretty much convenient.
 
-AvlTreeIterator class: this inner class inside the AvlTree was made to 
-hold information about an iterator of on the AvlTree. The iterator is
-initialized on the minimal element in the tree and on each iteration it
-proceeds to the successor of the current element, resulting in an ascending
-order of traversal. The AvlTree uses this class to create an iterator 
-to go over the tree values which I used to implement the deepcopy constructor.
+The program works as follows (assuming no type 2 errors, see below for error
+ handling) :
+# The manager is given the arguments to work with: sourcedir and commandfile.
+# The manager creates a parser object and uses it to create sections of the
+command file.
+# The parser reads the lines of the command file and creates sections
+composing filter and order objects according to the matched lines of 
+the file.
+# To create the different objects, the parser calls the appropriate 
+factory with the appropriate line in the command file that says which
+object to create.
+# The factory scans the line and creates the appropriate object, then
+sending it to the parser to create the section with that object.
+# The parser creates an ArrayList of sections and sends it back to the
+manager.
+# The manager then finally iterates over the different sections and
+for each section it calls the FilePrinter class with the files in the
+ directory to print warnings for this section,
+ followed by printing the filtered and ordered files of the directory
+ according to this section.
 
-More adjustments that can be made to improve this code:
-I've implemented the iterator only for the AVL tree and not for the BST,
-even though it should be implemented for the BST with the AVL to inherit it,
-since the AVL property has no meaning when it comes to iterate over the nodes.
-Also, the updateHeight method in the TreeNode class should be in the main 
-section of the BST class since it iterates over sections of the tree
-and not just on specific node.
+My Exception system:
 
-The add method in the AvlTree: the AvlTree calls for the add method in
-the BST to add the node in the general BST. If the node has been 
-successfuly added, the program will find the added node using treeSearch
-from BST (Now that i think of it, treeSearch takes O(logn) and it might be
-expensive to search the node again after it was added), update the heights of
-the node and it's ancestors using updateHeight from TreeNode since each
-ancestor's height has been increased by 1, and lastly call the private 
-AvlTree method treeBalance to check the balance factor of the node and
-it's ancestors to see if the tree needs a balancing after the insertion.
-To get the balance factor I used the private method getBalanceFactor which
-calculates the balance factor of a node based on its subtrees' heights.
-If it is to balance, the treeBalance method will call the rotationRight,
-,rotationLeft or both methods in order to perform rotations on the node
-that creates a violation according to the type of the violation: 
-RR, RL, LR, LL as we have seen in DAST. The rotations are performed
-based on the algorithms suggested in DAST (each rotation requires
-updating the data memebers of the rotated nodes in the TreeNode class).
+I divided the exception of my program into 2 types:
 
-The delete method in the AvlTree: the AvlTree calls for the delete method in
-the BST to delete the node in the general BST. We use treeSearch from BST
- to find the node. If it was deleted we keep it's
-father and call the treeBalance method on the father (if it exists) to check
- if the tree needs a balancing as a result of the deletion. 
-Since deleting a node in the tree doesn't affect the height of the ancesotrs,
-we only need to check for the balance. It will be done as mentioned in the 
-add method description.
-The shared methods between the 2 methods are treeBalance and treeSearch.
+1. All type 1 errors - warnings - are descendants of MyException which itself
+inherits from java's Exception which inherits from Throwable.
+The warnings are divided into filter warnings and order warnings:
+
+In the filter warnings we have BadFilterSizeWarning for invalid parameters
+to size filters which are thrown in each of the specific size filter class
+in case the input was invalid, and we also have BadFilterPropertyWarning 
+which applies the same to filters which are given YES/NO as parameters.
+In addition we have BadFilterNameWarning which is being thrown in the 
+FilterFactory whenever the factory is given an invalid filter name as 
+parameter. All these warnings are inherited from BadFilterWarning
+which is caught and handled in the FilterFactory itself, creating a
+default all filter and indicating that a warning has been detected.
+The consideration for this was that whenever we create a filter we 
+take into consideration that the input may be invalid, in that case
+the factory should inform the parser that it couldn't create the 
+filter that the parser requested and instead it created a default filter.
+The parser says "Thank you Factory" and follows the request to the 
+manager which follows it to the printer which spots the warning 
+indicated by the FilterFactory and prints it. This way each module
+is doing its job and we preserve the modular principles.
+
+In the order warnings we have a similar mechanism, except that 
+we only have BadOrderNameWarning which is being thrown and caught
+by the OrderFactory and then being forwarded to parser.
+
+The parser receives the BadOrderNameWarning and/or the BadFilterWarning
+and throws a BadSubSectionWarning which is the ancestor of these 2 warnings
+and inherits from MyException. That way the parser can tell the manager
+that it spotted a warning in some sub section of the command file,
+the manager doesn't care in which specific sub section it occurred,
+it only has to know that a warning has occurred, and we still preserve 
+the modular principles.
+
+For conclusion we have:
+( -> means extends)
+BadFilterNameWarning, BadFilterSizeWarning, BadFilterPropertyWarning ->
+-> BadFilterWarning, BadOrderNameWarning -> BadSubSectionWarning ->
+-> MyException -> Exception -> Throwable
+
+
+
+2. All type 2 errors - errors - are descendants of MyError which itself
+inherits from java's Error which inherits from Throwable.
+These errors will result in printing "ERROR" to STDERR and exiting
+the program, done by the manager.
+
+Most of these errors are being first spotted by the parser:
+If the given 'FILTER' string in the sub section is misspelled,
+an InvalidFilterError will be thrown by the parser, same goes
+for InvalidOrderError for order. These errors inherit from 
+BadCommandFileError which the parser throws to the manager whenever
+it encountered one of these errors. The BadCommandFileError inherits
+from MyError. BadCommandFileError will be thrown by the parser also
+if an empty line was spotted instead of a 'FILTER'/'ORDER'.
+The parser will also throw an IOException if it could not create a buffer
+for the command file using java's FileNotFoundException or it could not 
+read the command file's lines. The consideration here was that since 
+the parser is responisble for parsing and reading the command file,
+it is also responsible for indicating errors regarding parsing of the
+file meaning if it encountered an error that prevented it from creating 
+sections as requested by the manager, it will notify the manager that 
+it could not create the sections and then the manager will know that 
+a serious error has been occurred and it cannot continue running the 
+program as it wanted, in that case the manager will tell us "ERROR"
+and will exit the program.
+In addition, the manager itself will spot an error whenever the given
+arguments it received are illegal and it will throw a BadArgumentsError
+which inherits from MyError, in that case the program will fail immediately,
+so the manager will catch it and behave the same as above.
+
+For conclusion we have:
+
+InvalidFilterError, InvalidOrderError -> BadCommandFileError,
+,BadArgumentsError -> MyError -> Error -> Throwable
+
+
+Sorting the files:
+
+I used Comparator interface to compare 2 files using the compare method
+and decide their order according to the specific order - each specific
+order implements Order interface which itself extends the comparator,
+therfore each specific order has to implement the compare method which
+will decide the ordering of files. 
+The sorting is done in the FilePrinter: I firstly filter the wanted files
+and then use java's Collections class to sort the filtered files in 
+nlogn complexity according to comparison based sorting defined by the
+specific order in the given section. The comparison is done in-place
+which means I don't use an extra array to sort the files and therfore
+I don't use extra memory space, sorting is done in O(1).
+
+Lastly I would like to elaborate about the warning system:
+Each order/filter object hols a boolean field called warning.
+This field is initialized to be false, and upon creation of that
+object by the appropriate factory, if a warning in the command line
+has been spotted, the factory will set the object's warning field to 
+be true. Each section object holds an ArrayList with line numbers of
+ warnings in that section (the numbers are counted from the beginning
+ of the command file). After creating the filter, order objects, the 
+parser will create a section with these objects and add to the section's 
+field the line numbers of the warnings it found in the same order it found
+them. When the manager will call the printer, the printer will firstly
+print the warnings by accessing that section's field and printing the 
+warnings in the same order they were inserted.
+
 
 =============================
 =    Answers to questions   =
 =============================
 
-Answer to the question from section 5: 
-
-The 12 numbers will be inserted to an empty AVL tree in the following order:
-(from left to right)
-
-5 -> 3 -> 8 -> 2 -> 10 -> 4 -> 7 -> 1 -> 11 -> 6 -> 9 -> 12
-
-By the formula to find the minimal amount of nodes - n in a tree of height h,
-we have that: n(h) = n(h-1) + n(h-2) + 1 , where n(0) = 1, n(1) = 2.
-In the given example it satisfies that n(3) = n(2) + n(1) + 1 = 4 + 2 + 1 = 7
-and we can indeed see 7 nodes in the tree. Now, we were required to insert
-12 numbers and by the formula we have that n(4) = n(3) + n(2) + 1 = 7 + 4 + 1
-= 12, so we have to insert 4 nodes to a tree with minimal amount of nodes
-of height 3, all of them will be inserted in the height of at most 3,
-and then the next node will be the 12th, and will result in an avl tree
-of height 4. The sub-sequence above from 5 to 9 indeed creates an Avl tree of
-height 3 with 11 nodes, and when we insert 12 we will have a tree of height 4.
+See QUESTIONS file.
 
 
 
